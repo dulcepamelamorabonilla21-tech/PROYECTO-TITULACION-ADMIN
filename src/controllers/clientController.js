@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { sendLeadAssignedEmail } = require('../utils/mailer');
 
 async function getLeadsColumns(connection) {
   const [rows] = await connection.query(
@@ -103,9 +104,40 @@ async function assignLeadToAdvisor(req, res) {
       return res.status(404).json({ success: false, message: 'Lead no encontrado' });
     }
 
+    const [advisorEmailRows] = await connection.query(
+      `SELECT nombre, email
+       FROM usuarios
+       WHERE id = ? AND rol = 'asesor'
+       LIMIT 1`,
+      [advisorId]
+    );
+
+    const [leadRows] = await connection.query(
+      `SELECT id, nombre, email, telefono, servicio
+       FROM leads
+       WHERE id = ?
+       LIMIT 1`,
+      [leadId]
+    );
+
+    let emailStatus = { sent: false, reason: 'Datos insuficientes' };
+    if (advisorEmailRows.length && leadRows.length && advisorEmailRows[0].email) {
+      try {
+        emailStatus = await sendLeadAssignedEmail({
+          to: advisorEmailRows[0].email,
+          advisorName: advisorEmailRows[0].nombre,
+          lead: leadRows[0]
+        });
+      } catch (mailError) {
+        emailStatus = { sent: false, reason: mailError.message || 'No se pudo enviar el correo' };
+        console.error('Error enviando correo de lead asignado:', mailError);
+      }
+    }
+
     return res.json({
       success: true,
-      message: `Lead asignado correctamente a ${advisors[0].nombre}`
+      message: `Lead asignado correctamente a ${advisors[0].nombre}`,
+      email: emailStatus
     });
   } catch (error) {
     console.error('Error asignando lead a asesor:', error);

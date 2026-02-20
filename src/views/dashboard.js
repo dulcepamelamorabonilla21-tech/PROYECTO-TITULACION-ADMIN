@@ -209,7 +209,10 @@ clientTable.addEventListener('click', async (event) => {
       method: 'PATCH',
       body: JSON.stringify({ asesorId: advisorId })
     });
-    setMsg(data.message || 'Lead asignado', true);
+    const emailInfo = data.email?.sent
+      ? ' Correo enviado al asesor.'
+      : (data.email?.reason ? ` Correo no enviado: ${data.email.reason}.` : '');
+    setMsg(`${data.message || 'Lead asignado'}${emailInfo}`, true);
     await loadClients();
   } catch (error) {
     setMsg(error.message, false);
