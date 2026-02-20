@@ -134,6 +134,12 @@ button:hover {
   background: #263238;
 }
 
+.advisor-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .clients-card {
   background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
 }
@@ -245,6 +251,58 @@ button:hover {
 .assign-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 10px 20px rgba(29, 78, 216, 0.28);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.45);
+  padding: 16px;
+  z-index: 20;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-card {
+  width: min(740px, 100%);
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: 0 22px 45px rgba(2, 6, 23, 0.25);
+  padding: 18px;
+}
+
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.modal-head h3 {
+  margin: 0;
+}
+
+.ghost-btn {
+  width: auto;
+  background: #e2e8f0;
+  color: #0f172a;
+  padding: 8px 12px;
+}
+
+.ghost-btn:hover {
+  background: #cbd5e1;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
 }
 
 @media (max-width: 760px) {

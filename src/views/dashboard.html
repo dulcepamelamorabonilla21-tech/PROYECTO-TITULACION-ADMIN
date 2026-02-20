@@ -84,6 +84,31 @@
       </div>
     </div>
   </div>
+  <div id="resetModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Restablecer contrasena de asesor</h3>
+        <button id="closeResetBtn" class="ghost-btn" type="button">Cerrar</button>
+      </div>
+      <form id="resetForm">
+        <input type="hidden" id="resetAdvisorId">
+        <div class="row">
+          <div>
+            <label for="newPassword">Nueva contrasena</label>
+            <input id="newPassword" type="password" minlength="8" required>
+          </div>
+          <div>
+            <label for="confirmNewPassword">Confirmar contrasena</label>
+            <input id="confirmNewPassword" type="password" minlength="8" required>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="assign-btn">Restablecer</button>
+        </div>
+        <div id="resetMsg" class="msg"></div>
+      </form>
+    </div>
+  </div>
 
   <script src="/dashboard.js"></script>
 </body>

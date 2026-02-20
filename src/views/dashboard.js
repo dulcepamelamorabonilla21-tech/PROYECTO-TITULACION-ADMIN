@@ -11,6 +11,13 @@ const msg = document.getElementById('msg');
 const advisorTable = document.getElementById('advisorTable');
 const clientTable = document.getElementById('clientTable');
 const logoutBtn = document.getElementById('logoutBtn');
+const resetModal = document.getElementById('resetModal');
+const resetForm = document.getElementById('resetForm');
+const resetAdvisorId = document.getElementById('resetAdvisorId');
+const newPasswordInput = document.getElementById('newPassword');
+const confirmNewPasswordInput = document.getElementById('confirmNewPassword');
+const resetMsg = document.getElementById('resetMsg');
+const closeResetBtn = document.getElementById('closeResetBtn');
 let advisorsCache = [];
 
 adminInfo.textContent = `Sesión: ${adminUser.nombre || ''} (${adminUser.email || ''})`;
@@ -53,17 +60,48 @@ function renderAdvisors(rows) {
       <td><span class="badge">${isActive ? 'Activo' : 'Inactivo'}</span></td>
       <td>${item.fecha_creacion ? new Date(item.fecha_creacion).toLocaleString('es-MX') : '-'}</td>
       <td>
-        <button
-          type="button"
-          class="toggle-advisor-btn"
-          data-id="${item.id}"
-          data-next="${actionNext}"
-          style="width:auto;padding:6px 10px;"
-        >${actionLabel}</button>
+        <div class="advisor-actions">
+          <button
+            type="button"
+            class="toggle-advisor-btn"
+            data-id="${item.id}"
+            data-next="${actionNext}"
+            style="width:auto;padding:6px 10px;"
+          >${actionLabel}</button>
+          <button
+            type="button"
+            class="reset-advisor-btn"
+            data-id="${item.id}"
+            style="width:auto;padding:6px 10px;background:#334155;"
+          >Reset password</button>
+        </div>
       </td>
     `;
     advisorTable.appendChild(tr);
   });
+}
+
+function setResetMsg(text, ok) {
+  if (!resetMsg) return;
+  resetMsg.textContent = text;
+  resetMsg.className = `msg ${ok ? 'ok' : 'err'}`;
+}
+
+function openResetModal(advisorId) {
+  if (!resetModal) return;
+  resetAdvisorId.value = String(advisorId);
+  newPasswordInput.value = '';
+  confirmNewPasswordInput.value = '';
+  setResetMsg('', false);
+  resetModal.classList.add('show');
+  resetModal.setAttribute('aria-hidden', 'false');
+  newPasswordInput.focus();
+}
+
+function closeResetModal() {
+  if (!resetModal) return;
+  resetModal.classList.remove('show');
+  resetModal.setAttribute('aria-hidden', 'true');
 }
 
 function advisorOptions(selectedAdvisorId) {
@@ -172,6 +210,12 @@ form.addEventListener('submit', async (e) => {
 });
 
 advisorTable.addEventListener('click', async (event) => {
+  const resetBtn = event.target.closest('.reset-advisor-btn');
+  if (resetBtn) {
+    openResetModal(resetBtn.dataset.id);
+    return;
+  }
+
   const btn = event.target.closest('.toggle-advisor-btn');
   if (!btn) return;
 
@@ -190,6 +234,60 @@ advisorTable.addEventListener('click', async (event) => {
     setMsg(error.message, false);
   }
 });
+
+if (closeResetBtn) {
+  closeResetBtn.addEventListener('click', closeResetModal);
+}
+
+if (resetModal) {
+  resetModal.addEventListener('click', (event) => {
+    if (event.target === resetModal) {
+      closeResetModal();
+    }
+  });
+}
+
+if (resetForm) {
+  resetForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const advisorId = Number(resetAdvisorId.value);
+    const password = newPasswordInput.value;
+    const confirmPassword = confirmNewPasswordInput.value;
+
+    if (!advisorId) {
+      setResetMsg('Asesor invalido', false);
+      return;
+    }
+
+    if (!password || !confirmPassword) {
+      setResetMsg('Completa ambos campos', false);
+      return;
+    }
+
+    if (password.length < 8) {
+      setResetMsg('La contrasena debe tener minimo 8 caracteres', false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setResetMsg('Las contrasenas no coinciden', false);
+      return;
+    }
+
+    try {
+      const data = await api(`/api/admin/asesores/${advisorId}/reset-password`, {
+        method: 'PATCH',
+        body: JSON.stringify({ password, confirmPassword })
+      });
+      setResetMsg(data.message || 'Contrasena restablecida', true);
+      setMsg(data.message || 'Contrasena restablecida', true);
+      setTimeout(closeResetModal, 500);
+    } catch (error) {
+      setResetMsg(error.message, false);
+    }
+  });
+}
 
 clientTable.addEventListener('click', async (event) => {
   const btn = event.target.closest('.assign-lead-btn');

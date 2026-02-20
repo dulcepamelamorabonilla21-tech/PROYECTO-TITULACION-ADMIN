@@ -114,4 +114,48 @@ async function updateAdvisorStatus(req, res) {
   }
 }
 
-module.exports = { createAdvisor, listAdvisors, updateAdvisorStatus };
+async function resetAdvisorPassword(req, res) {
+  let connection;
+  try {
+    const advisorId = Number(req.params.id);
+    const password = String(req.body?.password || '');
+    const confirmPassword = String(req.body?.confirmPassword || '');
+
+    if (!Number.isInteger(advisorId) || advisorId <= 0) {
+      return res.status(400).json({ success: false, message: 'ID de asesor inválido' });
+    }
+
+    if (!password || !confirmPassword) {
+      return res.status(400).json({ success: false, message: 'Password y confirmación requeridos' });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ success: false, message: 'Las contraseñas no coinciden' });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({ success: false, message: 'La contraseña debe tener mínimo 8 caracteres' });
+    }
+
+    connection = await pool.getConnection();
+    const hash = await bcrypt.hash(password, 10);
+
+    const [result] = await connection.query(
+      'UPDATE usuarios SET contraseña = ? WHERE id = ? AND rol = ?',
+      [hash, advisorId, 'asesor']
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Asesor no encontrado' });
+    }
+
+    return res.json({ success: true, message: 'Contraseña restablecida correctamente' });
+  } catch (error) {
+    console.error('Error restableciendo contraseña de asesor:', error);
+    return res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
+module.exports = { createAdvisor, listAdvisors, updateAdvisorStatus, resetAdvisorPassword };
