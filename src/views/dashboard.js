@@ -11,6 +11,7 @@ const msg = document.getElementById('msg');
 const advisorTable = document.getElementById('advisorTable');
 const clientTable = document.getElementById('clientTable');
 const logoutBtn = document.getElementById('logoutBtn');
+let advisorsCache = [];
 
 adminInfo.textContent = `Sesión: ${adminUser.nombre || ''} (${adminUser.email || ''})`;
 
@@ -37,6 +38,7 @@ async function api(path, options = {}) {
 }
 
 function renderAdvisors(rows) {
+  advisorsCache = rows || [];
   advisorTable.innerHTML = '';
   rows.forEach((item) => {
     const isActive = Number(item.activo) === 1;
@@ -64,18 +66,51 @@ function renderAdvisors(rows) {
   });
 }
 
+function advisorOptions(selectedAdvisorId) {
+  const activeAdvisors = advisorsCache.filter((a) => Number(a.activo) === 1);
+  const baseOption = activeAdvisors.length
+    ? '<option value="">Selecciona asesor activo</option>'
+    : '<option value="">No hay asesores activos</option>';
+  const rows = activeAdvisors.map((advisor) => {
+    const selected = Number(selectedAdvisorId) === Number(advisor.id) ? 'selected' : '';
+    return `<option value="${advisor.id}" ${selected}>${advisor.nombre} (${advisor.email})</option>`;
+  });
+  return [baseOption, ...rows].join('');
+}
+
 function renderClients(rows) {
   if (!clientTable) return;
+  if (!Array.isArray(rows) || rows.length === 0) {
+    clientTable.innerHTML = '<tr><td colspan="9">Sin clientes registrados.</td></tr>';
+    return;
+  }
   clientTable.innerHTML = '';
   rows.forEach((item) => {
+    const assigned = item.asesor_nombre
+      ? `${item.asesor_nombre} (${item.asesor_email || '-'})`
+      : 'Sin asignar';
+    const serviceLabel = (item.servicio || '-').replaceAll('_', ' ');
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${item.id}</td>
-      <td>${item.nombre}</td>
-      <td>${item.email}</td>
+      <td><div class="cell-clip" title="${item.nombre || '-'}">${item.nombre || '-'}</div></td>
+      <td><div class="cell-clip" title="${item.email || '-'}">${item.email || '-'}</div></td>
       <td>${item.telefono || '-'}</td>
-      <td>${item.servicio || '-'}</td>
-      <td>${item.mensaje || '-'}</td>
+      <td><span class="service-tag" title="${serviceLabel}">${serviceLabel}</span></td>
+      <td><div class="cell-clip message-clip" title="${item.mensaje || '-'}">${item.mensaje || '-'}</div></td>
+      <td><span class="assigned-badge ${item.asesor_nombre ? 'is-assigned' : 'is-unassigned'}">${assigned}</span></td>
+      <td>
+        <div class="assign-control">
+        <select class="assign-select" data-lead-id="${item.id}">
+          ${advisorOptions(item.asesor_id)}
+        </select>
+        <button
+          type="button"
+          class="assign-lead-btn assign-btn"
+          data-id="${item.id}"
+        >Asignar</button>
+        </div>
+      </td>
       <td>${item.fecha_creacion ? new Date(item.fecha_creacion).toLocaleString('es-MX') : '-'}</td>
     `;
     clientTable.appendChild(tr);
@@ -101,6 +136,9 @@ async function loadClients() {
   try {
     const data = await api('/api/admin/clientes', { method: 'GET' });
     renderClients(data.clients || []);
+    if (data.assignmentEnabled === false) {
+      setMsg('Asignacion deshabilitada: ejecuta migration_add_lead_assignment.sql en la BD.', false);
+    }
   } catch (error) {
     setMsg(error.message, false);
   }
@@ -144,6 +182,32 @@ advisorTable.addEventListener('click', async (event) => {
     });
     setMsg(data.message || 'Estatus actualizado', true);
     await loadAdvisors();
+    await loadClients();
+  } catch (error) {
+    setMsg(error.message, false);
+  }
+});
+
+clientTable.addEventListener('click', async (event) => {
+  const btn = event.target.closest('.assign-lead-btn');
+  if (!btn) return;
+
+  const leadId = btn.dataset.id;
+  const select = clientTable.querySelector(`select[data-lead-id="${leadId}"]`);
+  const advisorId = Number(select?.value);
+
+  if (!advisorId) {
+    setMsg('Selecciona un asesor activo para asignar el lead', false);
+    return;
+  }
+
+  try {
+    const data = await api(`/api/admin/clientes/${leadId}/asignar`, {
+      method: 'PATCH',
+      body: JSON.stringify({ asesorId: advisorId })
+    });
+    setMsg(data.message || 'Lead asignado', true);
+    await loadClients();
   } catch (error) {
     setMsg(error.message, false);
   }
@@ -155,4 +219,9 @@ logoutBtn.addEventListener('click', () => {
   window.location.href = '/login.html';
 });
 
-Promise.all([loadAdvisors(), loadClients()]);
+async function initDashboard() {
+  await loadAdvisors();
+  await loadClients();
+}
+
+initDashboard();

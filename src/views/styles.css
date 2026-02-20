@@ -22,7 +22,7 @@ body {
 }
 
 .wrap {
-  max-width: 980px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 24px;
 }
@@ -108,6 +108,14 @@ button:hover {
   padding: 10px;
   border-bottom: 1px solid var(--border);
   font-size: 14px;
+  vertical-align: top;
+}
+
+.table th {
+  background: #f7faff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .badge {
@@ -126,8 +134,123 @@ button:hover {
   background: #263238;
 }
 
+.clients-card {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+}
+
+.table-wrap {
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.clients-table {
+  margin-top: 0;
+  min-width: 1150px;
+}
+
+.clients-table th {
+  font-size: 12px;
+  letter-spacing: .2px;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.clients-table td {
+  font-size: 13px;
+}
+
+.cell-clip {
+  max-width: 210px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.message-clip {
+  max-width: 280px;
+}
+
+.service-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef4ff;
+  color: #0b57d0;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.assigned-badge {
+  display: inline-block;
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.assigned-badge.is-assigned {
+  background: #e6f6ec;
+  color: #157347;
+}
+
+.assigned-badge.is-unassigned {
+  background: #fff4e5;
+  color: #9a3412;
+}
+
+.assign-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 290px;
+}
+
+.assign-select {
+  min-width: 210px;
+  width: 210px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.assign-select:focus {
+  outline: 2px solid #bfdbfe;
+  border-color: #60a5fa;
+}
+
+.assign-btn {
+  width: auto;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0b57d0 0%, #1d4ed8 100%);
+  box-shadow: 0 6px 14px rgba(29, 78, 216, 0.25);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.assign-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(29, 78, 216, 0.28);
+}
+
 @media (max-width: 760px) {
   .row {
     grid-template-columns: 1fr;
+  }
+
+  .wrap {
+    padding: 16px;
+  }
+
+  .table th, .table td {
+    padding: 8px;
   }
 }
