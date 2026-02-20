@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin ProInvest - Login</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="wrap" style="max-width: 520px; padding-top: 72px;">
+    <div class="card">
+      <h1>Panel Admin ProInvest</h1>
+      <p>Acceso exclusivo para administradores.</p>
+
+      <form id="loginForm">
+        <label for="email">Correo admin</label>
+        <input id="email" type="email" placeholder="admin@proinvest.mx" required>
+
+        <label for="password">Contraseña</label>
+        <input id="password" type="password" placeholder="********" required>
+
+        <button type="submit">Entrar</button>
+        <div id="msg" class="msg"></div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/login.js"></script>
+</body>
+</html>
