@@ -20,7 +20,7 @@ async function listClients(_req, res) {
     if (hasAssignmentCols) {
       [rows] = await connection.query(
         `SELECT l.id, l.nombre, l.email, l.telefono, l.servicio, l.mensaje, l.fecha_creacion,
-                l.asesor_id, u.nombre AS asesor_nombre, u.email AS asesor_email
+                l.asesor_id, u.nombre AS asesor_nombre, u.email AS asesor_email, u.activo AS asesor_activo
          FROM leads l
          LEFT JOIN usuarios u ON u.id = l.asesor_id AND u.rol = 'asesor'
          ORDER BY l.fecha_creacion DESC

@@ -204,6 +204,12 @@ button:hover {
   color: #9a3412;
 }
 
+.assigned-badge.is-inactive {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
 .assign-control {
   display: flex;
   align-items: center;

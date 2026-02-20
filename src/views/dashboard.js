@@ -86,9 +86,12 @@ function renderClients(rows) {
   }
   clientTable.innerHTML = '';
   rows.forEach((item) => {
+    const hasAdvisorAssigned = Number(item.asesor_id) > 0;
+    const isAdvisorActive = Number(item.asesor_activo) === 1;
+    const isInactiveAssigned = hasAdvisorAssigned && !isAdvisorActive;
     const assigned = item.asesor_nombre
       ? `${item.asesor_nombre} (${item.asesor_email || '-'})`
-      : 'Sin asignar';
+      : (hasAdvisorAssigned ? 'Asesor no disponible' : 'Sin asignar');
     const serviceLabel = (item.servicio || '-').replaceAll('_', ' ');
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -98,7 +101,7 @@ function renderClients(rows) {
       <td>${item.telefono || '-'}</td>
       <td><span class="service-tag" title="${serviceLabel}">${serviceLabel}</span></td>
       <td><div class="cell-clip message-clip" title="${item.mensaje || '-'}">${item.mensaje || '-'}</div></td>
-      <td><span class="assigned-badge ${item.asesor_nombre ? 'is-assigned' : 'is-unassigned'}">${assigned}</span></td>
+      <td><span class="assigned-badge ${isInactiveAssigned ? 'is-inactive' : (item.asesor_nombre ? 'is-assigned' : 'is-unassigned')}">${assigned}${isInactiveAssigned ? ' - INACTIVO' : ''}</span></td>
       <td>
         <div class="assign-control">
         <select class="assign-select" data-lead-id="${item.id}">
