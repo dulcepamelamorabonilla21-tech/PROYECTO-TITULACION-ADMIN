@@ -9,6 +9,7 @@ const adminInfo = document.getElementById('adminInfo');
 const form = document.getElementById('advisorForm');
 const msg = document.getElementById('msg');
 const advisorTable = document.getElementById('advisorTable');
+const clientTable = document.getElementById('clientTable');
 const logoutBtn = document.getElementById('logoutBtn');
 
 adminInfo.textContent = `Sesión: ${adminUser.nombre || ''} (${adminUser.email || ''})`;
@@ -63,6 +64,24 @@ function renderAdvisors(rows) {
   });
 }
 
+function renderClients(rows) {
+  if (!clientTable) return;
+  clientTable.innerHTML = '';
+  rows.forEach((item) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${item.id}</td>
+      <td>${item.nombre}</td>
+      <td>${item.email}</td>
+      <td>${item.telefono || '-'}</td>
+      <td>${item.servicio || '-'}</td>
+      <td>${item.mensaje || '-'}</td>
+      <td>${item.fecha_creacion ? new Date(item.fecha_creacion).toLocaleString('es-MX') : '-'}</td>
+    `;
+    clientTable.appendChild(tr);
+  });
+}
+
 async function loadAdvisors() {
   try {
     const data = await api('/api/admin/asesores', { method: 'GET' });
@@ -74,6 +93,16 @@ async function loadAdvisors() {
       localStorage.removeItem('admin_user');
       window.location.href = '/login.html';
     }
+  }
+}
+
+async function loadClients() {
+  if (!clientTable) return;
+  try {
+    const data = await api('/api/admin/clientes', { method: 'GET' });
+    renderClients(data.clients || []);
+  } catch (error) {
+    setMsg(error.message, false);
   }
 }
 
@@ -126,4 +155,4 @@ logoutBtn.addEventListener('click', () => {
   window.location.href = '/login.html';
 });
 
-loadAdvisors();
+Promise.all([loadAdvisors(), loadClients()]);
