@@ -10,6 +10,7 @@ const form = document.getElementById('advisorForm');
 const msg = document.getElementById('msg');
 const advisorTable = document.getElementById('advisorTable');
 const clientTable = document.getElementById('clientTable');
+const trackingTable = document.getElementById('trackingTable');
 const logoutBtn = document.getElementById('logoutBtn');
 const resetModal = document.getElementById('resetModal');
 const resetForm = document.getElementById('resetForm');
@@ -158,6 +159,69 @@ function renderClients(rows) {
   });
 }
 
+function formatDateTime(value) {
+  if (!value) return '-';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '-';
+  return date.toLocaleString('es-MX');
+}
+
+function statusMeta(status) {
+  const map = {
+    nuevo: { label: 'Nuevo', cls: 'track-contactado' },
+    no_contactado: { label: 'No contactado', cls: 'track-sin-contacto' },
+    en_proceso: { label: 'En proceso', cls: 'track-seguimiento' },
+    propuesta: { label: 'Propuesta', cls: 'track-seguimiento' },
+    ganado: { label: 'Ganado', cls: 'track-cerrado-venta' },
+    perdido: { label: 'Perdido', cls: 'track-cerrado-sin-venta' }
+  };
+  return map[status] || map.nuevo;
+}
+
+function renderTracking(rows) {
+  if (!trackingTable) return;
+  if (!Array.isArray(rows) || rows.length === 0) {
+    trackingTable.innerHTML = '<tr><td colspan="7">Sin leads para seguimiento.</td></tr>';
+    return;
+  }
+
+  trackingTable.innerHTML = '';
+  rows.forEach((item) => {
+    const assigned = item.asesor_nombre
+      ? `${item.asesor_nombre} (${item.asesor_email || '-'})`
+      : 'Sin asignar';
+    const isInactiveAssigned = Number(item.asesor_id) > 0 && Number(item.asesor_activo) !== 1;
+    const meta = statusMeta(item.estatus_seguimiento);
+    const detailParts = [];
+    if (item.canal_ultimo_contacto) detailParts.push(`Canal: ${item.canal_ultimo_contacto}`);
+    if (item.proxima_accion) detailParts.push(`Accion: ${item.proxima_accion}`);
+    if (item.motivo_perdido) detailParts.push(`Perdido: ${item.motivo_perdido}`);
+    if (item.videollamada_solicitada === 1 || item.videollamada_solicitada === true) {
+      detailParts.push(`Videollamada: ${item.videollamada_fecha ? formatDateTime(item.videollamada_fecha) : 'Solicitada'}`);
+    }
+    if (item.comentarios_asesor) detailParts.push(item.comentarios_asesor);
+    const detailText = detailParts.length ? detailParts.join(' | ') : '-';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div class="cell-clip" title="${item.nombre || '-'}">${item.nombre || '-'}</div>
+        <div class="muted-mini">${item.email || '-'}</div>
+      </td>
+      <td>
+        <span class="assigned-badge ${isInactiveAssigned ? 'is-inactive' : (item.asesor_nombre ? 'is-assigned' : 'is-unassigned')}">
+          ${assigned}${isInactiveAssigned ? ' - INACTIVO' : ''}
+        </span>
+      </td>
+      <td><span class="track-badge ${meta.cls}">${meta.label}</span></td>
+      <td>${Number(item.contacto_exitoso) === 1 ? 'Si' : 'No'}</td>
+      <td>${formatDateTime(item.fecha_ultimo_contacto)}</td>
+      <td>${formatDateTime(item.proximo_contacto)}</td>
+      <td><div class="cell-clip message-clip" title="${detailText}">${detailText}</div></td>
+    `;
+    trackingTable.appendChild(tr);
+  });
+}
+
 async function loadAdvisors() {
   try {
     const data = await api('/api/admin/asesores', { method: 'GET' });
@@ -179,6 +243,19 @@ async function loadClients() {
     renderClients(data.clients || []);
     if (data.assignmentEnabled === false) {
       setMsg('Asignacion deshabilitada: ejecuta migration_add_lead_assignment.sql en la BD.', false);
+    }
+  } catch (error) {
+    setMsg(error.message, false);
+  }
+}
+
+async function loadTracking() {
+  if (!trackingTable) return;
+  try {
+    const data = await api('/api/admin/clientes/seguimiento', { method: 'GET' });
+    renderTracking(data.tracking || []);
+    if (data.trackingEnabled === false) {
+      setMsg('Seguimiento incompleto: faltan columnas estatus_seguimiento/contacto_exitoso en leads del proyecto web.', false);
     }
   } catch (error) {
     setMsg(error.message, false);
@@ -230,6 +307,7 @@ advisorTable.addEventListener('click', async (event) => {
     setMsg(data.message || 'Estatus actualizado', true);
     await loadAdvisors();
     await loadClients();
+    await loadTracking();
   } catch (error) {
     setMsg(error.message, false);
   }
@@ -311,7 +389,7 @@ clientTable.addEventListener('click', async (event) => {
       ? ' Correo enviado al asesor.'
       : (data.email?.reason ? ` Correo no enviado: ${data.email.reason}.` : '');
     setMsg(`${data.message || 'Lead asignado'}${emailInfo}`, true);
-    await loadClients();
+    await Promise.all([loadClients(), loadTracking()]);
   } catch (error) {
     setMsg(error.message, false);
   }
@@ -325,7 +403,7 @@ logoutBtn.addEventListener('click', () => {
 
 async function initDashboard() {
   await loadAdvisors();
-  await loadClients();
+  await Promise.all([loadClients(), loadTracking()]);
 }
 
 initDashboard();

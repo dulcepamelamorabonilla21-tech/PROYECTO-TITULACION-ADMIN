@@ -10,6 +10,19 @@ async function getLeadsColumns(connection) {
   return new Set(rows.map((r) => String(r.COLUMN_NAME)));
 }
 
+function hasTrackingColumns(columns) {
+  return (
+    columns.has('estatus_seguimiento') &&
+    columns.has('contacto_exitoso') &&
+    columns.has('canal_ultimo_contacto') &&
+    columns.has('proxima_accion') &&
+    columns.has('motivo_perdido') &&
+    columns.has('comentarios_asesor') &&
+    columns.has('fecha_ultimo_contacto') &&
+    columns.has('proximo_contacto')
+  );
+}
+
 async function listClients(_req, res) {
   let connection;
   try {
@@ -147,4 +160,58 @@ async function assignLeadToAdvisor(req, res) {
   }
 }
 
-module.exports = { listClients, assignLeadToAdvisor };
+async function listLeadTracking(_req, res) {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    const columns = await getLeadsColumns(connection);
+    const trackingEnabled = hasTrackingColumns(columns);
+
+    let rows = [];
+    if (trackingEnabled) {
+      [rows] = await connection.query(
+        `SELECT l.id, l.nombre, l.email, l.telefono, l.servicio, l.fecha_creacion,
+                l.asesor_id, u.nombre AS asesor_nombre, u.email AS asesor_email, u.activo AS asesor_activo,
+                l.estatus_seguimiento, l.contacto_exitoso, l.canal_ultimo_contacto,
+                l.proxima_accion, l.motivo_perdido, l.comentarios_asesor,
+                l.fecha_ultimo_contacto, l.proximo_contacto, l.videollamada_solicitada, l.videollamada_fecha
+         FROM leads l
+         LEFT JOIN usuarios u ON u.id = l.asesor_id AND u.rol = 'asesor'
+         ORDER BY l.fecha_creacion DESC
+         LIMIT 700`
+      );
+    } else {
+      [rows] = await connection.query(
+        `SELECT l.id, l.nombre, l.email, l.telefono, l.servicio, l.fecha_creacion,
+                l.asesor_id, u.nombre AS asesor_nombre, u.email AS asesor_email, u.activo AS asesor_activo
+         FROM leads l
+         LEFT JOIN usuarios u ON u.id = l.asesor_id AND u.rol = 'asesor'
+         ORDER BY l.fecha_creacion DESC
+         LIMIT 700`
+      );
+
+      rows = rows.map((item) => ({
+        ...item,
+        estatus_seguimiento: 'nuevo',
+        contacto_exitoso: 0,
+        canal_ultimo_contacto: null,
+        proxima_accion: null,
+        motivo_perdido: null,
+        comentarios_asesor: null,
+        fecha_ultimo_contacto: null,
+        proximo_contacto: null,
+        videollamada_solicitada: 0,
+        videollamada_fecha: null
+      }));
+    }
+
+    return res.json({ success: true, tracking: rows, trackingEnabled });
+  } catch (error) {
+    console.error('Error listando seguimiento de leads:', error);
+    return res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
+module.exports = { listClients, assignLeadToAdvisor, listLeadTracking };
