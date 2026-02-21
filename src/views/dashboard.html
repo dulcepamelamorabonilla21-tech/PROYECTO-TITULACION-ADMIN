@@ -16,7 +16,14 @@
       <button id="logoutBtn" class="logout">Cerrar sesion</button>
     </div>
 
-    <div class="card" style="margin-bottom: 16px;">
+    <div class="section-tabs" id="sectionTabs">
+      <button type="button" class="tab-btn active" data-target="asesores">Asesores</button>
+      <button type="button" class="tab-btn" data-target="leads">Leads</button>
+      <button type="button" class="tab-btn" data-target="seguimiento">Seguimiento</button>
+    </div>
+
+    <div class="panel-section active" data-section="asesores">
+      <div class="card" style="margin-bottom: 16px;">
       <h2>Alta de asesor</h2>
       <p>Solo usuarios con rol admin pueden crear asesores.</p>
       <form id="advisorForm">
@@ -61,8 +68,10 @@
         <tbody id="advisorTable"></tbody>
       </table>
     </div>
+    </div>
 
-    <div class="card clients-card" style="margin-top: 16px;">
+    <div class="panel-section" data-section="leads">
+      <div class="card clients-card">
       <h2>Clientes registrados</h2>
       <div class="table-wrap">
         <table class="table clients-table">
@@ -83,8 +92,10 @@
         </table>
       </div>
     </div>
+    </div>
 
-    <div class="card clients-card" style="margin-top: 16px;">
+    <div class="panel-section" data-section="seguimiento">
+      <div class="card clients-card">
       <h2>Seguimiento de leads</h2>
       <div class="table-wrap">
         <table class="table clients-table">
@@ -102,6 +113,7 @@
           <tbody id="trackingTable"></tbody>
         </table>
       </div>
+    </div>
     </div>
   </div>
   <div id="resetModal" class="modal" aria-hidden="true">

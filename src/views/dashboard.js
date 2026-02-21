@@ -12,6 +12,8 @@ const advisorTable = document.getElementById('advisorTable');
 const clientTable = document.getElementById('clientTable');
 const trackingTable = document.getElementById('trackingTable');
 const logoutBtn = document.getElementById('logoutBtn');
+const sectionTabs = document.getElementById('sectionTabs');
+const panelSections = Array.from(document.querySelectorAll('.panel-section'));
 const resetModal = document.getElementById('resetModal');
 const resetForm = document.getElementById('resetForm');
 const resetAdvisorId = document.getElementById('resetAdvisorId');
@@ -26,6 +28,25 @@ adminInfo.textContent = `Sesión: ${adminUser.nombre || ''} (${adminUser.email |
 function setMsg(text, ok) {
   msg.textContent = text;
   msg.className = `msg ${ok ? 'ok' : 'err'}`;
+}
+
+function activateSection(target) {
+  panelSections.forEach((section) => {
+    section.classList.toggle('active', section.dataset.section === target);
+  });
+
+  if (sectionTabs) {
+    const buttons = sectionTabs.querySelectorAll('.tab-btn');
+    buttons.forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.target === target);
+    });
+  }
+
+  try {
+    localStorage.setItem('admin_active_section', target);
+  } catch (_error) {
+    // no-op
+  }
 }
 
 async function api(path, options = {}) {
@@ -402,6 +423,17 @@ logoutBtn.addEventListener('click', () => {
 });
 
 async function initDashboard() {
+  if (sectionTabs) {
+    sectionTabs.addEventListener('click', (event) => {
+      const btn = event.target.closest('.tab-btn');
+      if (!btn) return;
+      activateSection(btn.dataset.target);
+    });
+  }
+
+  const savedSection = localStorage.getItem('admin_active_section');
+  activateSection(savedSection || 'asesores');
+
   await loadAdvisors();
   await Promise.all([loadClients(), loadTracking()]);
 }

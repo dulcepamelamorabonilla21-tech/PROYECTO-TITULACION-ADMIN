@@ -97,6 +97,41 @@ button:hover {
   margin-bottom: 18px;
 }
 
+.section-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  width: auto;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #0f172a;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.tab-btn:hover {
+  background: #f8fafc;
+}
+
+.tab-btn.active {
+  color: #fff;
+  background: linear-gradient(135deg, #0b57d0 0%, #1d4ed8 100%);
+  border-color: #1d4ed8;
+}
+
+.panel-section {
+  display: none;
+}
+
+.panel-section.active {
+  display: block;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
