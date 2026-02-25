@@ -21,6 +21,80 @@ body {
   background: linear-gradient(180deg, #eef3ff 0%, var(--bg) 100%);
 }
 
+.login-page {
+  min-height: 100vh;
+  background:
+    linear-gradient(110deg, rgba(2, 6, 23, 0.86) 0%, rgba(15, 23, 42, 0.72) 45%, rgba(2, 6, 23, 0.84) 100%),
+    url('/images/fondo%20administradores.png') center/cover no-repeat fixed;
+}
+
+.login-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+}
+
+.login-hero {
+  display: flex;
+  align-items: center;
+  padding: 56px;
+}
+
+.login-hero-content {
+  max-width: 640px;
+  color: #f8fafc;
+}
+
+.login-kicker {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  border-radius: 999px;
+  color: #e2e8f0;
+  font-size: 12px;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.login-hero h1 {
+  margin: 0 0 12px;
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 1.08;
+}
+
+.login-hero p {
+  margin: 0;
+  color: #e2e8f0;
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+.login-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.login-card {
+  width: min(470px, 100%);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 18px 38px rgba(2, 6, 23, 0.26);
+  backdrop-filter: blur(3px);
+}
+
+.login-card h2 {
+  margin: 0 0 6px;
+  font-size: 28px;
+}
+
+.login-card p {
+  margin-bottom: 18px;
+}
+
 .wrap {
   max-width: 1320px;
   margin: 0 auto;
@@ -389,6 +463,135 @@ button:hover {
   min-height: 90px;
 }
 
+.dashboard-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.22) 0%, rgba(30, 41, 59, 0.04) 35%, rgba(2, 6, 23, 0.65) 100%),
+    linear-gradient(130deg, rgba(2, 6, 23, 0.87) 0%, rgba(15, 23, 42, 0.76) 46%, rgba(2, 6, 23, 0.9) 100%),
+    url('/images/fondo%20panel.png') center/cover no-repeat fixed;
+}
+
+.dashboard-page .wrap {
+  max-width: 1440px;
+  padding: 28px;
+}
+
+.dashboard-page .topbar {
+  margin-bottom: 20px;
+  padding: 18px 22px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: rgba(248, 250, 252, 0.93);
+  box-shadow: 0 18px 36px rgba(2, 6, 23, 0.26);
+  backdrop-filter: blur(4px);
+}
+
+.dashboard-page .topbar h1 {
+  font-size: clamp(24px, 3.2vw, 36px);
+  margin-bottom: 4px;
+}
+
+.dashboard-page .topbar p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.dashboard-page .card {
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  box-shadow: 0 18px 32px rgba(2, 6, 23, 0.22);
+  background: rgba(248, 250, 252, 0.95);
+  backdrop-filter: blur(2px);
+}
+
+.executive-banner {
+  margin-bottom: 16px;
+  padding: 24px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.82) 0%, rgba(30, 41, 59, 0.76) 100%);
+  box-shadow: 0 20px 38px rgba(2, 6, 23, 0.34);
+}
+
+.executive-kicker {
+  display: inline-block;
+  margin: 0 0 10px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .8px;
+}
+
+.executive-banner h2 {
+  color: #f8fafc;
+  margin: 0 0 8px;
+  font-size: clamp(23px, 3vw, 34px);
+  line-height: 1.12;
+}
+
+.executive-banner p {
+  color: #cbd5e1;
+  margin: 0;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.kpi-card {
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(248, 250, 252, 0.93);
+  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.2);
+  padding: 14px 16px;
+}
+
+.kpi-label {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  letter-spacing: .35px;
+  text-transform: uppercase;
+}
+
+.kpi-value {
+  margin: 0;
+  font-size: clamp(28px, 3.2vw, 34px);
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.dashboard-page .section-tabs {
+  margin-bottom: 18px;
+  padding: 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  background: rgba(15, 23, 42, 0.3);
+  width: fit-content;
+}
+
+.dashboard-page .tab-btn {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.dashboard-page .table-wrap {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 16px;
+}
+
+.dashboard-page .clients-card {
+  background: rgba(248, 250, 252, 0.96);
+}
+
 @media (max-width: 760px) {
   .row {
     grid-template-columns: 1fr;
@@ -400,5 +603,59 @@ button:hover {
 
   .table th, .table td {
     padding: 8px;
+  }
+
+  .login-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .login-hero {
+    padding: 24px 20px 10px;
+  }
+
+  .login-hero h1 {
+    font-size: 28px;
+  }
+
+  .login-hero p {
+    font-size: 14px;
+  }
+
+  .login-panel {
+    padding: 16px;
+  }
+
+  .login-card {
+    padding: 20px;
+    border-radius: 14px;
+  }
+
+  .dashboard-page .wrap {
+    padding: 16px;
+  }
+
+  .dashboard-page .topbar {
+    padding: 14px;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .dashboard-page .section-tabs {
+    width: 100%;
+    border-radius: 14px;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .executive-banner {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
   }
 }

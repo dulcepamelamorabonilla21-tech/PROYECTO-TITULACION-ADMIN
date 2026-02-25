@@ -6,7 +6,7 @@
   <title>Admin ProInvest - Panel</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
-<body>
+<body class="dashboard-page">
   <div class="wrap">
     <div class="topbar">
       <div>
@@ -14,6 +14,33 @@
         <p id="adminInfo">Sesion activa</p>
       </div>
       <button id="logoutBtn" class="logout">Cerrar sesion</button>
+    </div>
+
+    <div class="executive-banner">
+      <div>
+        <p class="executive-kicker">CONTROL COMERCIAL</p>
+        <h2>Operacion centralizada de asesores y leads</h2>
+        <p>Monitorea asignaciones, avance comercial y actividad de seguimiento en tiempo real.</p>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <article class="kpi-card">
+        <p class="kpi-label">Leads Totales</p>
+        <p class="kpi-value" id="kpiTotalLeads">0</p>
+      </article>
+      <article class="kpi-card">
+        <p class="kpi-label">Leads Asignados</p>
+        <p class="kpi-value" id="kpiAssignedLeads">0</p>
+      </article>
+      <article class="kpi-card">
+        <p class="kpi-label">Sin Asignar</p>
+        <p class="kpi-value" id="kpiUnassignedLeads">0</p>
+      </article>
+      <article class="kpi-card">
+        <p class="kpi-label">En Seguimiento</p>
+        <p class="kpi-value" id="kpiActiveFollowups">0</p>
+      </article>
     </div>
 
     <div class="section-tabs" id="sectionTabs">

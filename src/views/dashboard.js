@@ -21,13 +21,31 @@ const newPasswordInput = document.getElementById('newPassword');
 const confirmNewPasswordInput = document.getElementById('confirmNewPassword');
 const resetMsg = document.getElementById('resetMsg');
 const closeResetBtn = document.getElementById('closeResetBtn');
+const kpiTotalLeads = document.getElementById('kpiTotalLeads');
+const kpiAssignedLeads = document.getElementById('kpiAssignedLeads');
+const kpiUnassignedLeads = document.getElementById('kpiUnassignedLeads');
+const kpiActiveFollowups = document.getElementById('kpiActiveFollowups');
 let advisorsCache = [];
+let clientsCache = [];
+let trackingCache = [];
 
 adminInfo.textContent = `Sesión: ${adminUser.nombre || ''} (${adminUser.email || ''})`;
 
 function setMsg(text, ok) {
   msg.textContent = text;
   msg.className = `msg ${ok ? 'ok' : 'err'}`;
+}
+
+function renderKpis() {
+  const totalLeads = clientsCache.length;
+  const assignedLeads = clientsCache.filter((item) => Number(item.asesor_id) > 0).length;
+  const unassignedLeads = Math.max(totalLeads - assignedLeads, 0);
+  const activeFollowups = trackingCache.filter((item) => ['en_proceso', 'propuesta'].includes(String(item.estatus_seguimiento || ''))).length;
+
+  if (kpiTotalLeads) kpiTotalLeads.textContent = String(totalLeads);
+  if (kpiAssignedLeads) kpiAssignedLeads.textContent = String(assignedLeads);
+  if (kpiUnassignedLeads) kpiUnassignedLeads.textContent = String(unassignedLeads);
+  if (kpiActiveFollowups) kpiActiveFollowups.textContent = String(activeFollowups);
 }
 
 function activateSection(target) {
@@ -261,7 +279,9 @@ async function loadClients() {
   if (!clientTable) return;
   try {
     const data = await api('/api/admin/clientes', { method: 'GET' });
-    renderClients(data.clients || []);
+    clientsCache = Array.isArray(data.clients) ? data.clients : [];
+    renderClients(clientsCache);
+    renderKpis();
     if (data.assignmentEnabled === false) {
       setMsg('Asignacion deshabilitada: ejecuta migration_add_lead_assignment.sql en la BD.', false);
     }
@@ -274,7 +294,9 @@ async function loadTracking() {
   if (!trackingTable) return;
   try {
     const data = await api('/api/admin/clientes/seguimiento', { method: 'GET' });
-    renderTracking(data.tracking || []);
+    trackingCache = Array.isArray(data.tracking) ? data.tracking : [];
+    renderTracking(trackingCache);
+    renderKpis();
     if (data.trackingEnabled === false) {
       setMsg('Seguimiento incompleto: faltan columnas estatus_seguimiento/contacto_exitoso en leads del proyecto web.', false);
     }
